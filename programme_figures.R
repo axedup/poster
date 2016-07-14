@@ -1,9 +1,9 @@
 ﻿pat_brul_2011<-read.csv2("F:/Invs/Brulés/patients_rm_fm_dp_2011.csv")
 library(ggplots2) ## pour faire beau graphiques !!!
+library(dplyr)
+#ggplot(data=brules_2011,aes(x=brules_2011$ageg14,y=f))+geom_point()
 
-ggplot(data=brules_2011,aes(x=brules_2011$ageg14,y=f))+geom_point()
-
-Egraph<-pat_brul_2011 %>% 
+graph<-pat_brul_2011 %>% 
   group_by(ageg14,fm_residence) %>%
   summarise(total = length(numAno))
   
