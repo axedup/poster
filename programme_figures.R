@@ -20,18 +20,18 @@ levels(brules_2011$ageg14)<-c( "0-2","2-14","15-49" ,"50-79" ,">80")
 table(brules_2011$ageg14)
 
 graph<-pat_brul_2011 %>% 
-  group_by(ageg14,fm_residence) %>%
+  group_by(ageg14,fm_residence,fm_hopital) %>%
   summarise(total = length(numAno))
   
 graph$name<-"patients"
 
 graph2<-brules_2011 %>% 
-  group_by(ageg14,fm_residence) %>%
+  group_by(ageg14,fm_residence,fm_hopital) %>%
   summarise(total = length(numAno))
 
 graph2$name<-"séjours"
 
-#d <- rbind(graph, graph2)
+d <- rbind(graph, graph2)
 #d<-d[d$fm_residence==1 & !is.na(d$fm_residence),]
 #d$name<-as.factor(d$name)
 #p <- ggplot(d, aes(x=ageg14, y=total, fill = name)) + geom_bar(stat="identity")
@@ -40,9 +40,10 @@ graph2$name<-"séjours"
 
 
 
-d<-d[d$fm_residence==1 & !is.na(d$fm_residence),]
+d<-d[d$fm_residence==1 & !is.na(d$fm_residence) & d$fm_hopital==1 & !is.na(d$fm_hopital),]
 d$name<-as.factor(d$name)
-p <- ggplot(d ,aes(x=ageg14, y=total, fill = name)) + geom_bar(position="dodge",stat="identity")+xlab("Age")+ guides(fill=guide_legend(title=NULL))
+p <- ggplot(d ,aes(x=ageg14, y=total, fill = name)) + geom_bar(position="dodge",stat="identity")+xlab("Age")+ ylab("Effectifs")+guides(fill=guide_legend(title=NULL))+geom_text(aes(label = total), size = 3, hjust = 0.5,vjust=2, position =position_dodge(width=0.9)) 
+
 p
 
 
@@ -75,9 +76,22 @@ levels(graph3B$gravite2)<-c("non grave","grave")
   mutate(pour=round(totali*100/sum(totali), 2) )
 
 ggplot(data=graph4,aes(x=ageg14,y=pour,fill=gravite2))+geom_bar(position="dodge",stat="identity") +xlab("Age")+ylab("Pourcentage")+ 
-guides(fill=guide_legend(title=NULL))
+guides(fill=guide_legend(title=NULL))+
+geom_text(aes(label = round(pour,0)), size = 3, hjust = 0.5,vjust=2, position =position_dodge(width=0.9))  +
+scale_fill_brewer(palette = "Dark2")
   
   
 #  ggplot(data=graph2[graph2$fm_residence==1,],aes(x=graph2$ageg14[graph2$fm_residence==1],y=graph2$total[graph2$fm_residence==1]))+
 #  geom_bar(position="dodge",stat="identity")
 
+Effectifs<-c(12380,11821,11907,11651,8944,8826,8846,8670)
+type<-c("Séjours","Séjours","Séjours","Séjours","Patients" ,"Patients","Patients","Patients")
+annee<-c("2008","2009","2010","2011","2008","2009","2010","2011")
+
+evol<-data.frame(annee,type,Effectifs)
+evol$type<-as.factor(evol$type)
+evol$annee<-as.factor(evol$annee)
+
+p <- ggplot(evol ,aes(x=annee, y=Effectifs, fill = type)) + geom_bar(position="dodge",stat="identity")+xlab("Année")+ guides(fill=guide_legend(title=NULL))+geom_text(aes(label = effectifs), size = 3, hjust = 0.5,vjust=2, position =position_dodge(width=0.9)) 
+
+p
